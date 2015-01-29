@@ -1,4 +1,5 @@
 //= require jquery.iframe-transport.js
+//= require jquery.formdata-transport.js
 //= require_self
 
 (function($) {
@@ -8,6 +9,7 @@
   $.remotipart = remotipart = {
 
     setup: function(form) {
+      console.log("Setupping the remotiparts");
       // Preserve form.data('ujs:submit-button') before it gets nulled by $.ajax.handleRemote
       var button = form.data('ujs:submit-button'),
           csrfParam = $('meta[name="csrf-param"]').attr('content'),
@@ -23,7 +25,10 @@
           // delete settings.beforeSend;
           delete settings.beforeSend;
 
-          settings.iframe      = true;
+          if (typeof FormData !== 'undefined')
+            settings.formdata  = true;
+          else
+            settings.iframe    = true;
           settings.files       = $($.rails.fileInputSelector, form);
           settings.data        = form.serializeArray();
 
@@ -65,6 +70,7 @@
         // Keep track that we just set this particular form with Remotipart bindings
         // Note: The `true` value will get over-written with the `settings.dataType` from the `ajax:beforeSend` handler
         .data('remotipartSubmitted', true);
+        console.log("Alllllll done");
     },
 
     teardown: function(form) {
@@ -83,6 +89,10 @@
     // and trigger the `ajax:beforeSend` callback to which remotipart binds functionality.
     $.rails.handleRemote(form);
     return false;
+  });
+
+  $(document).on('ajax:success', function(e) {
+    console.log(e);
   });
 
 })(jQuery);
